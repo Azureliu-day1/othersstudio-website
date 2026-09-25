@@ -7,6 +7,7 @@ import CoverMedia from "@/components/CoverMedia";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getServerT, getLocale } from "@/i18n/server";
 import { LOCALE_TAGS, format } from "@/i18n/messages";
+import { localizeArticle } from "@/lib/content-i18n";
 
 async function getArticles() {
   try {
@@ -64,8 +65,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ThoughtsPage() {
-  const [{ pinned, articles }, t, locale] = await Promise.all([getArticles(), getServerT(), getLocale()]);
+  const [{ pinned: pinnedRaw, articles: articlesRaw }, t, locale] = await Promise.all([getArticles(), getServerT(), getLocale()]);
   const tag = LOCALE_TAGS[locale];
+  const pinned = pinnedRaw ? localizeArticle(pinnedRaw, locale) : null;
+  const articles = articlesRaw.map((a) => localizeArticle(a, locale));
   const hasData = pinned || articles.length > 0;
 
   const fallbackPinned = {

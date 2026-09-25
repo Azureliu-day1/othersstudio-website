@@ -5,7 +5,8 @@ import FadeIn from "@/components/FadeIn";
 import BrandCover from "@/components/BrandCover";
 import { supabaseAdmin } from "@/lib/supabase";
 import type { Metadata } from "next";
-import { getServerT } from "@/i18n/server";
+import { getServerT, getLocale } from "@/i18n/server";
+import { localizeUpdate } from "@/lib/content-i18n";
 
 async function getUpdates() {
   try {
@@ -43,7 +44,8 @@ function TypeBadge({ type, labels }: { type: string; labels: Record<string, stri
 }
 
 export default async function UpdatesPage() {
-  const [dbUpdates, t] = await Promise.all([getUpdates(), getServerT()]);
+  const [dbUpdatesRaw, t, locale] = await Promise.all([getUpdates(), getServerT(), getLocale()]);
+  const dbUpdates = dbUpdatesRaw.map((u) => localizeUpdate(u, locale));
   const hasData = dbUpdates.length > 0;
   const typeLabels: Record<string, string> = {
     "app-update": t("updates.type.app"),

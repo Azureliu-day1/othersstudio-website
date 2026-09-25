@@ -14,6 +14,7 @@ import CoachTimingDemo from "@/components/CoachTimingDemo";
 import TrainingDataDemo from "@/components/TrainingDataDemo";
 import { getServerT, getLocale } from "@/i18n/server";
 import { isChineseLocale, format } from "@/i18n/messages";
+import { localizeArticle, localizeUpdate } from "@/lib/content-i18n";
 import { supabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -102,7 +103,7 @@ export default async function Home() {
     { initial: "B", name: "成员 B", role: "AI & 后端", bio: "机器学习工程师，负责 AI 教练和智能推荐算法。让数据有温度。", avatar_url: "" },
   ];
   const previewArticles = hasArticles
-    ? dbArticles
+    ? dbArticles.map((a) => localizeArticle(a, locale))
     : [
         { tag: "产品思考", title: "为什么我们选择用 AI 重新定义健身记录", excerpt: "传统健身 App 的问题在于它们只是电子化了纸质记录。我们认为，真正的突破在于让 AI 理解你的训练语境...", published_at: "2025-06-08", content: "x".repeat(6000) },
         { tag: "功能逻辑", title: "「身体准备度」功能的设计逻辑", excerpt: "如何将 HRV、睡眠、训练负荷等多维度数据融合成一个直观的准备度评分...", published_at: "2025-06-05", content: "x".repeat(4000) },
@@ -110,7 +111,7 @@ export default async function Home() {
       ];
 
   const previewUpdates = (hasUpdates
-    ? dbUpdates.map((u) => ({
+    ? dbUpdates.map((raw) => localizeUpdate(raw, locale)).map((u) => ({
         date: formatDate(u.published_at),
         title: u.version ? `${u.version} ${t("updates.released")} · ${u.title}` : u.title,
         text: u.content || u.why || "",
