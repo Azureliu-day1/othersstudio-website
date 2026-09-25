@@ -11,6 +11,7 @@ import { cache } from "react";
 import type { Metadata } from "next";
 import { getServerT, getLocale } from "@/i18n/server";
 import { LOCALE_TAGS } from "@/i18n/messages";
+import { localizeArticle } from "@/lib/content-i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ interface Article {
   cover_url: string | null;
   published_at: string | null;
   view_count: number | null;
+  translations?: unknown;
 }
 
 // cache：同一请求里 generateMetadata 与页面各查一次，合并为一次
@@ -30,7 +32,7 @@ const getArticle = cache(async (id: string): Promise<Article | null> => {
   try {
     const { data, error } = await supabaseAdmin
       .from("website_articles")
-      .select("id,title,tag,excerpt,content,cover_url,published_at,view_count")
+      .select("id,title,tag,excerpt,content,cover_url,published_at,view_count,translations")
       .eq("id", id)
       .eq("status", "published")
       .single();
@@ -53,8 +55,9 @@ function formatDate(d: string | null, tag: string) {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const article = await getArticle(id);
-  if (!article) return {};
+  const [raw, locale] = await Promise.all([getArticle(id), getLocale()]);
+  if (!raw) return {};
+  const article = localizeArticle(raw, locale);
   const cover = resolveCover(article.cover_url);
   return {
     title: article.title,
@@ -76,9 +79,10 @@ export default async function ThoughtDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [article, t, locale] = await Promise.all([getArticle(id), getServerT(), getLocale()]);
+  const [raw, t, locale] = await Promise.all([getArticle(id), getServerT(), getLocale()]);
 
-  if (!article) notFound();
+  if (!raw) notFound();
+  const article = localizeArticle(raw, locale);
 
   const readTime = `${Math.ceil((article.content?.length || 0) / 500)} ${t("card.readMins")}`;
   const cover = resolveCover(article.cover_url);

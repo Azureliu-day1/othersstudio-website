@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { TranslationsEditor } from "../../components/TranslationsEditor";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { saveUpdateAction } from "../../../actions";
@@ -146,6 +147,11 @@ export default function NewUpdatePage() {
             className="w-full px-4 py-3 rounded-xl border border-[#C9A88C]/20 bg-white text-[#3D2B1F] text-sm focus:outline-none focus:ring-2 focus:ring-[#5C3D2E]/20 transition-all resize-y"
             placeholder="写点什么..."
           />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-[#6B4E3D] mb-2">译文（繁中 / 英 / 日 / 韩）</label>
+          <TranslationsEditor kind="update" initial={undefined} />
         </div>
 
         {state?.error && (

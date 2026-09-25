@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ImageIcon, Upload } from "lucide-react";
 import { saveArticleAction, uploadImageAction } from "../../../actions";
+import { TranslationsEditor } from "../../components/TranslationsEditor";
 import { ImageUploader } from "../../components/ImageUploader";
 
 export default function NewArticlePage() {
@@ -133,6 +134,11 @@ export default function NewArticlePage() {
             onChange={handleInsertImage}
             className="hidden"
           />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-[#6B4E3D] mb-2">译文（繁中 / 英 / 日 / 韩）</label>
+          <TranslationsEditor kind="article" initial={undefined} />
         </div>
 
         {state?.error && (

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { isAuthenticated, setAuthCookie, clearAuthCookie, verifyPassword } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { parseTranslationsField } from "@/lib/content-i18n";
 
 // ─── Auth Actions ────────────────────────────────────────────
 
@@ -45,6 +46,7 @@ export async function saveArticleAction(
     cover_url: formData.get("cover_url") as string || null,
     status,
     is_pinned: formData.get("is_pinned") === "true",
+    translations: parseTranslationsField(formData.get("translations")),
     published_at: status === "published" ? new Date().toISOString() : null,
     updated_at: new Date().toISOString(),
   };
@@ -116,6 +118,7 @@ export async function saveUpdateAction(
     content: formData.get("content") as string,
     cover_url: formData.get("cover_url") as string || null,
     photos: photosRaw ? JSON.parse(photosRaw) : [],
+    translations: parseTranslationsField(formData.get("translations")),
     status,
     published_at: status === "published" ? new Date().toISOString() : null,
   };
