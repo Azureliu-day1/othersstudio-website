@@ -13,9 +13,13 @@ import FoodScanDemo from "@/components/FoodScanDemo";
 import CoachTimingDemo from "@/components/CoachTimingDemo";
 import TrainingDataDemo from "@/components/TrainingDataDemo";
 import { getServerT, getLocale } from "@/i18n/server";
+import { isChineseLocale, format } from "@/i18n/messages";
 import { supabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
+
+/** 数据库未配置时的兜底下载链接（地区中立，App Store 按用户所在商店跳转） */
+const APP_STORE_URL = "https://apps.apple.com/app/day-1-ai-fitness/id6759196162";
 
 async function getRecentContent() {
   try {
@@ -69,49 +73,28 @@ export default async function Home() {
   const hasArticles = dbArticles.length > 0;
   const hasUpdates = dbUpdates.length > 0;
 
-  // 产品区门面兜底（数据库未配 product 时使用）：随语言切换，避免英文用户看到中文
-  const productFallbackByLang = {
-    zh: {
-      title: "DAY 1 — 你的智能健身伙伴",
-      subtitle: "不只是记录，更是理解",
-      description: "用 AI 重新定义训练记录与恢复管理，让每一天都是最好的 Day 1。",
-      detail: "DAY 1 结合 Apple Health 数据和 AI 分析，帮你了解身体状态，智能规划训练，并在你需要时提供个性化的教练建议。",
-      features: [
-        "AI 实时教练 — 训练中的智能语音指导",
-        "身体准备度 — 基于 HRV/睡眠的每日状态评估",
-        "智能训练计划 — 根据恢复情况动态调整",
-        "Apple Watch 联动 — 手腕上的训练助手",
-        "训练数据分析 — 可视化你的进步轨迹",
-      ],
-      app_store_url: "",
-    },
-    en: {
-      title: "DAY 1 — Your smart fitness companion",
-      subtitle: "More than tracking — understanding",
-      description: "AI reimagines training logs and recovery, making every day the best Day 1.",
-      detail: "DAY 1 combines Apple Health data with AI analysis to help you understand your body, plan training intelligently, and get personalized coaching when you need it.",
-      features: [
-        "Live AI coach — smart voice guidance during workouts",
-        "Body readiness — daily status from HRV / sleep",
-        "Smart training plans — adapt to your recovery",
-        "Apple Watch sync — your training assistant on the wrist",
-        "Training analytics — visualize your progress",
-      ],
-      app_store_url: "",
-    },
+  // 产品区门面兜底：随语言切换，来自五语字典
+  const productFallback = {
+    title: t("product.title"),
+    subtitle: t("product.subtitle"),
+    description: t("product.description"),
+    detail: t("product.detail"),
+    features: [t("product.f1"), t("product.f2"), t("product.f3"), t("product.f4"), t("product.f5")],
+    image_url: "",
+    app_store_url: APP_STORE_URL,
   };
   // 产品区文案策略：
-  // - 中文：优先用数据库配置；数据库没配则用中文兜底
-  // - 英文：数据库内容是中文（不翻译），所以英文文案一律走代码英文版，
+  // - 中文（简/繁）：优先用数据库配置；数据库没配则用字典兜底
+  // - 其他语言：数据库内容是中文（不翻译），文案一律走字典，
   //   但保留数据库里与语言无关的图片/链接（image_url / app_store_url）。
-  const product =
-    locale === "en"
-      ? {
-          ...productFallbackByLang.en,
-          image_url: settings.product?.image_url ?? "",
-          app_store_url: settings.product?.app_store_url ?? productFallbackByLang.en.app_store_url,
-        }
-      : settings.product || productFallbackByLang.zh;
+  const product = isChineseLocale(locale)
+    ? { ...productFallback, ...(settings.product || {}) }
+    : {
+        ...productFallback,
+        image_url: settings.product?.image_url ?? "",
+        app_store_url: settings.product?.app_store_url || APP_STORE_URL,
+      };
+  const appStoreUrl: string = product.app_store_url || APP_STORE_URL;
 
   const teamMembers = settings.team || [
     { initial: "L", name: "创始人", role: "产品 & 设计", bio: "独立开发者，热爱用技术解决真实问题。相信好的产品来自对生活的细致观察。", avatar_url: "" },
@@ -129,7 +112,7 @@ export default async function Home() {
   const previewUpdates = (hasUpdates
     ? dbUpdates.map((u) => ({
         date: formatDate(u.published_at),
-        title: u.version ? `${u.version} 上线 · ${u.title}` : u.title,
+        title: u.version ? `${u.version} ${t("updates.released")} · ${u.title}` : u.title,
         text: u.content || u.why || "",
         hasLink: u.type === "app-update",
       }))
@@ -321,13 +304,24 @@ export default async function Home() {
                 );
               })}
             </ul>
+            <div className="mt-10">
+              <a
+                href={appStoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-on-ink text-ink text-sm font-semibold no-underline shadow-[0_8px_26px_rgba(0,0,0,0.35)] hover:-translate-y-0.5 active:translate-y-0 transition-transform duration-[var(--dur-base)] ease-[var(--ease-out-soft)]"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.37 12.63c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.72-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.61 2.25 2.75 2.21 1.1-.04 1.52-.71 2.86-.71 1.33 0 1.71.71 2.88.69 1.19-.02 1.94-1.08 2.66-2.15.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.31-.89-2.33-3.55zM14.18 6.16c.6-.74 1.01-1.76.9-2.78-.87.04-1.93.58-2.55 1.31-.56.65-1.05 1.69-.92 2.69.97.07 1.96-.49 2.57-1.22z"/></svg>
+                {t("product.appStore")}
+              </a>
+            </div>
           </Reveal>
           <Reveal direction="up" index={1} className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden border border-on-ink/10 bg-[radial-gradient(130%_100%_at_50%_28%,rgba(96,63,47,0.45)_0%,rgba(45,31,23,0.7)_45%,rgba(26,18,14,0.92)_100%)] shadow-[inset_0_1px_0_rgba(255,180,140,0.10),inset_0_-44px_80px_-44px_rgba(0,0,0,0.55)]">
             {product.image_url ? (
               <>
                 <img
                   src={product.image_url}
-                  alt="DAY 1 训练场景"
+                  alt="DAY 1"
                   className="absolute inset-0 w-full h-full object-cover opacity-80"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink via-[rgba(41,32,26,0.45)] to-transparent" />

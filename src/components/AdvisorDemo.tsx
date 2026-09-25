@@ -20,6 +20,7 @@ import {
   MIN_DAYS,
   MAX_DAYS,
 } from "@/lib/advisor";
+import { isChineseLocale } from "@/i18n/messages";
 
 type Phase = "idle" | "thinking" | "result" | "limited" | "error";
 
@@ -101,7 +102,7 @@ function prefersReducedMotion(): boolean {
 
 export default function AdvisorDemo() {
   const { locale } = useLocale();
-  const lang: "zh" | "en" = locale === "en" ? "en" : "zh";
+  const lang: "zh" | "en" = isChineseLocale(locale) ? "zh" : "en";
   const c = COPY[lang];
   const pick = (o: { zh: string; en: string }) => (lang === "en" ? o.en : o.zh);
 

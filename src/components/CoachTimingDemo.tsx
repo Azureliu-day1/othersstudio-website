@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale } from "@/i18n/LocaleProvider";
 import Reveal from "@/components/Reveal";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { isChineseLocale } from "@/i18n/messages";
 
 type Lang = "zh" | "en";
 
@@ -111,7 +112,7 @@ function Spark({ size = 18, className = "", color }: { size?: number; className?
 
 export default function CoachTimingDemo() {
   const { locale } = useLocale();
-  const lang: Lang = locale === "en" ? "en" : "zh";
+  const lang: Lang = isChineseLocale(locale) ? "zh" : "en";
   const c = COPY[lang];
 
   const { ref, inView } = useInView<HTMLDivElement>(0.4);

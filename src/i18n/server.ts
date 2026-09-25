@@ -1,20 +1,24 @@
 /**
- * 服务端读取当前 locale（从 cookie）。供根 layout 与服务端页面使用。
+ * 服务端读取当前 locale：cookie 优先；首次访问没有 cookie 时按浏览器 Accept-Language 挑。
+ * 供根 layout 与服务端页面使用。
  */
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import {
   type Locale,
-  LOCALES,
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
+  normalizeLocale,
+  pickLocaleFromAcceptLanguage,
   translate,
 } from "./messages";
 
 export async function getLocale(): Promise<Locale> {
   const jar = await cookies();
-  const value = jar.get(LOCALE_COOKIE)?.value as Locale | undefined;
-  return value && LOCALES.includes(value) ? value : DEFAULT_LOCALE;
+  const fromCookie = normalizeLocale(jar.get(LOCALE_COOKIE)?.value);
+  if (fromCookie) return fromCookie;
+  const h = await headers();
+  return pickLocaleFromAcceptLanguage(h.get("accept-language")) ?? DEFAULT_LOCALE;
 }
 
 /** 服务端取词：在服务端组件里直接翻译门面文案。 */

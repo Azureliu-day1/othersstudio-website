@@ -1,9 +1,12 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FadeIn from "@/components/FadeIn";
 import CoverMedia from "@/components/CoverMedia";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getServerT, getLocale } from "@/i18n/server";
+import { LOCALE_TAGS, format } from "@/i18n/messages";
 
 async function getArticles() {
   try {
@@ -28,9 +31,9 @@ async function getArticles() {
   }
 }
 
-function formatDate(d: string | null) {
+function formatDate(d: string | null, tag: string) {
   if (!d) return "";
-  return new Date(d).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" });
+  return new Date(d).toLocaleDateString(tag, { year: "numeric", month: "long", day: "numeric" });
 }
 
 // 有 id（真实文章）渲染为可点击链接；无 id（示例占位）渲染为静态卡片
@@ -55,8 +58,14 @@ function CardWrapper({
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT();
+  return { title: t("nav.thoughts"), description: t("thoughts.desc"), alternates: { canonical: "/thoughts" } };
+}
+
 export default async function ThoughtsPage() {
-  const { pinned, articles } = await getArticles();
+  const [{ pinned, articles }, t, locale] = await Promise.all([getArticles(), getServerT(), getLocale()]);
+  const tag = LOCALE_TAGS[locale];
   const hasData = pinned || articles.length > 0;
 
   const fallbackPinned = {
@@ -77,11 +86,11 @@ export default async function ThoughtsPage() {
   ];
 
   const displayPinned = pinned
-    ? { id: pinned.id as string, tag: pinned.tag, title: pinned.title, excerpt: pinned.excerpt || "", date: formatDate(pinned.published_at), readTime: `${Math.ceil((pinned.content?.length || 0) / 500)} 分钟阅读`, cover: (pinned.cover_url as string | null) || null }
+    ? { id: pinned.id as string, tag: pinned.tag, title: pinned.title, excerpt: pinned.excerpt || "", date: formatDate(pinned.published_at, tag), readTime: `${Math.ceil((pinned.content?.length || 0) / 500)} ${t("card.readMins")}`, cover: (pinned.cover_url as string | null) || null }
     : { ...fallbackPinned, id: null as string | null, cover: null as string | null };
 
   const displayArticles = hasData
-    ? articles.map((a) => ({ id: a.id as string | null, tag: a.tag, title: a.title, excerpt: a.excerpt || "", date: formatDate(a.published_at), readTime: `${Math.ceil((a.content?.length || 0) / 500)} 分钟`, cover: (a.cover_url as string | null) || null }))
+    ? articles.map((a) => ({ id: a.id as string | null, tag: a.tag, title: a.title, excerpt: a.excerpt || "", date: formatDate(a.published_at, tag), readTime: `${Math.ceil((a.content?.length || 0) / 500)} ${t("card.readMins")}`, cover: (a.cover_url as string | null) || null }))
     : fallbackArticles.map((a) => ({ ...a, id: null as string | null, cover: null as string | null }));
 
   return (
@@ -89,9 +98,9 @@ export default async function ThoughtsPage() {
       <Navbar />
 
       <header className="pt-36 pb-14 max-w-[1200px] mx-auto px-6 md:px-15">
-        <h1 className="text-[clamp(2.5rem,5.5vw,4rem)] mb-4 tracking-[-0.02em] max-w-[16ch]">思考与产品思路</h1>
+        <h1 className="text-[clamp(2.5rem,5.5vw,4rem)] mb-4 tracking-[-0.02em] max-w-[16ch]">{t("thoughts.title")}</h1>
         <p className="text-lg text-text-muted max-w-[48ch]">
-          关于产品、设计与生活的独立思考。记录灵感、沉淀观点。
+          {t("thoughts.desc")}
         </p>
       </header>
 
@@ -103,7 +112,7 @@ export default async function ThoughtsPage() {
               <CoverMedia cover={displayPinned.cover} seed={`pinned-${displayPinned.title}`} alt={displayPinned.title} zoomOnHover />
               <span className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink/80 backdrop-blur-sm text-on-ink rounded-full text-xs font-medium z-10">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg>
-                置顶精选
+                {t("thoughts.pinned")}
               </span>
             </div>
             <div className="p-8 lg:p-12 flex flex-col justify-center">
@@ -122,9 +131,9 @@ export default async function ThoughtsPage() {
       {/* Section heading — 真实反映内容，替代过去点击无反应的假筛选 Tab */}
       <section className="max-w-[1200px] mx-auto px-6 md:px-15">
         <div className="flex items-baseline justify-between gap-4 mb-12 border-b border-border pb-4">
-          <h2 className="font-serif text-xl text-text">全部文章</h2>
+          <h2 className="font-serif text-xl text-text">{t("thoughts.all")}</h2>
           <span className="text-xs text-text-soft font-mono tracking-wide">
-            按时间倒序 · 共 {displayArticles.length} 篇
+            {format(t("thoughts.count"), { n: displayArticles.length })}
           </span>
         </div>
       </section>

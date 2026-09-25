@@ -7,6 +7,10 @@ import FadeIn from "@/components/FadeIn";
 import BrandCover from "@/components/BrandCover";
 import { resolveCover } from "@/lib/covers";
 import { supabaseAdmin } from "@/lib/supabase";
+import { cache } from "react";
+import type { Metadata } from "next";
+import { getServerT, getLocale } from "@/i18n/server";
+import { LOCALE_TAGS } from "@/i18n/messages";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +25,8 @@ interface Article {
   view_count: number | null;
 }
 
-async function getArticle(id: string): Promise<Article | null> {
+// cache：同一请求里 generateMetadata 与页面各查一次，合并为一次
+const getArticle = cache(async (id: string): Promise<Article | null> => {
   try {
     const { data, error } = await supabaseAdmin
       .from("website_articles")
@@ -35,15 +40,34 @@ async function getArticle(id: string): Promise<Article | null> {
   } catch {
     return null;
   }
-}
+});
 
-function formatDate(d: string | null) {
+function formatDate(d: string | null, tag: string) {
   if (!d) return "";
-  return new Date(d).toLocaleDateString("zh-CN", {
+  return new Date(d).toLocaleDateString(tag, {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const article = await getArticle(id);
+  if (!article) return {};
+  const cover = resolveCover(article.cover_url);
+  return {
+    title: article.title,
+    description: article.excerpt || undefined,
+    alternates: { canonical: `/thoughts/${article.id}` },
+    openGraph: {
+      type: "article",
+      title: article.title,
+      description: article.excerpt || undefined,
+      publishedTime: article.published_at || undefined,
+      ...(cover.kind === "image" ? { images: [{ url: cover.url }] } : {}),
+    },
+  };
 }
 
 export default async function ThoughtDetailPage({
@@ -52,11 +76,11 @@ export default async function ThoughtDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const article = await getArticle(id);
+  const [article, t, locale] = await Promise.all([getArticle(id), getServerT(), getLocale()]);
 
   if (!article) notFound();
 
-  const readTime = `${Math.ceil((article.content?.length || 0) / 500)} 分钟阅读`;
+  const readTime = `${Math.ceil((article.content?.length || 0) / 500)} ${t("card.readMins")}`;
   const cover = resolveCover(article.cover_url);
   const paragraphs = (article.content || "")
     .split(/\n{2,}/)
@@ -77,7 +101,7 @@ export default async function ThoughtDetailPage({
               <span className="transition-transform duration-300 group-hover:-translate-x-1">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
               </span>
-              返回思考列表
+              {t("article.back")}
             </Link>
 
             <span className="inline-flex items-center px-3 py-1 border border-border-strong text-text-mid rounded-full text-xs font-medium tracking-wide">
@@ -90,7 +114,7 @@ export default async function ThoughtDetailPage({
           </h1>
 
           <div className="flex items-center gap-4 text-xs text-text-soft font-mono mb-12">
-            <span>{formatDate(article.published_at)}</span>
+            <span>{formatDate(article.published_at, LOCALE_TAGS[locale])}</span>
             <span className="w-1 h-1 rounded-full bg-text-soft/50" />
             <span>{readTime}</span>
           </div>
@@ -121,7 +145,7 @@ export default async function ThoughtDetailPage({
                 </p>
               ))
             ) : (
-              <p className="text-text-muted italic">这篇文章还没有正文内容。</p>
+              <p className="text-text-muted italic">{t("article.empty")}</p>
             )}
           </div>
         </FadeIn>
@@ -135,7 +159,7 @@ export default async function ThoughtDetailPage({
               <span className="transition-transform duration-300 group-hover:-translate-x-1">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
               </span>
-              返回思考列表
+              {t("article.back")}
             </Link>
           </div>
         </FadeIn>
