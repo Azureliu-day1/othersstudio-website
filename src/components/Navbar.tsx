@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useLocale } from "@/i18n/LocaleProvider";
+import LanguageMenu from "@/components/LanguageMenu";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const { t, locale, setLocale } = useLocale();
+  const { t } = useLocale();
 
   const links = [
     { href: "/thoughts", label: t("nav.thoughts") },
@@ -16,8 +17,6 @@ export default function Navbar() {
     { href: "/#product", label: t("nav.product") },
     { href: "/#team", label: t("nav.team") },
   ];
-
-  const toggleLocale = () => setLocale(locale === "zh" ? "en" : "zh");
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-100 px-6 md:px-15 h-16 flex items-center justify-between backdrop-blur-xl bg-bg/85 border-b border-border transition-all">
@@ -29,7 +28,7 @@ export default function Navbar() {
       >
         {/* 品牌 3D Logo（橙→粉红渐变立体字，透明底）。装饰性图片，普通 img 即可 */}
         <img
-          src="/brand/day1-logo-3d.png"
+          src="/brand/day1-logo-3d.webp"
           alt="DAY 1"
           className="h-8 w-auto select-none"
           draggable={false}
@@ -54,14 +53,9 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <button
-          type="button"
-          onClick={toggleLocale}
-          aria-label="切换语言 / Switch language"
-          className="hidden sm:inline-flex items-center justify-center min-w-9 h-9 px-2.5 rounded-full border border-border-strong text-xs font-semibold text-text-mid no-underline hover:border-ink hover:bg-surface transition-all cursor-pointer"
-        >
-          {t("lang.switch")}
-        </button>
+        <div className="hidden sm:block">
+          <LanguageMenu />
+        </div>
 
         <Link
           href="/me/developer"
@@ -110,17 +104,10 @@ export default function Navbar() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
             {t("nav.developer")}
           </Link>
-          <button
-            type="button"
-            onClick={() => {
-              toggleLocale();
-              setOpen(false);
-            }}
-            className="mt-1 inline-flex items-center gap-2 px-2 py-2.5 text-base font-medium text-text-mid no-underline cursor-pointer text-left"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            {locale === "zh" ? "English" : "中文"}
-          </button>
+          <div className="mt-2 px-2 py-1.5 flex items-center gap-3 text-sm text-text-mid">
+            <span>{t("nav.language")}</span>
+            <LanguageMenu align="left" />
+          </div>
         </div>
       )}
     </nav>

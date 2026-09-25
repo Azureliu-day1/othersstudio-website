@@ -4,6 +4,7 @@ import { useState } from "react";
 import { generateApiKey } from "../actions";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/i18n/LocaleProvider";
+import { isChineseLocale } from "@/i18n/messages";
 
 const T = {
   zh: {
@@ -50,7 +51,7 @@ const T = {
 
 export function CreateKeyForm({ activeCount }: { activeCount: number }) {
   const { locale } = useLocale();
-  const tx = locale === "en" ? T.en : T.zh;
+  const tx = isChineseLocale(locale) ? T.zh : T.en;
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

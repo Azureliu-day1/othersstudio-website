@@ -2,22 +2,24 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { verifyToken, COOKIE_NAME } from "@/lib/auth";
+import { normalizeLocale } from "@/i18n/messages";
 
-// 语言前缀路由：/en 或 /zh 仅用于"分享指定语言链接"。
-// 命中后设置 NEXT_LOCALE cookie，并重写到去掉前缀的干净 URL（URL 不暴露 /en）。
-const LOCALE_PREFIXES = ["en", "zh"] as const;
+// 语言前缀路由：/en /zh /zh-hant /ja /ko 仅用于"分享指定语言链接"。
+// 命中后设置 NEXT_LOCALE cookie，并重写到去掉前缀的干净 URL（URL 不暴露前缀）。
+const LOCALE_PREFIXES = ["en", "zh", "zh-hant", "zh-hans", "zh-tw", "zh-hk", "ja", "ko"] as const;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 语言前缀处理（最前、独立于鉴权逻辑）
-  const seg = pathname.split("/")[1];
-  if ((LOCALE_PREFIXES as readonly string[]).includes(seg)) {
+  const seg = pathname.split("/")[1]?.toLowerCase();
+  const locale = (LOCALE_PREFIXES as readonly string[]).includes(seg) ? normalizeLocale(seg) : null;
+  if (locale) {
     const rest = pathname.slice(seg.length + 1) || "/";
     const url = request.nextUrl.clone();
     url.pathname = rest;
     const response = NextResponse.redirect(url);
-    response.cookies.set("NEXT_LOCALE", seg, {
+    response.cookies.set("NEXT_LOCALE", locale, {
       path: "/",
       maxAge: 31536000,
       sameSite: "lax",
@@ -94,5 +96,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/me/:path*", "/en/:path*", "/en", "/zh/:path*", "/zh"],
+  matcher: [
+    "/admin/:path*", "/me/:path*",
+    "/en/:path*", "/en", "/zh/:path*", "/zh", "/zh-hant/:path*", "/zh-hant", "/zh-hans/:path*", "/zh-hans",
+    "/zh-tw/:path*", "/zh-tw", "/zh-hk/:path*", "/zh-hk", "/ja/:path*", "/ja", "/ko/:path*", "/ko",
+  ],
 };

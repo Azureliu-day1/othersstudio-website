@@ -4,6 +4,8 @@ import Footer from "@/components/Footer";
 import FadeIn from "@/components/FadeIn";
 import BrandCover from "@/components/BrandCover";
 import { supabaseAdmin } from "@/lib/supabase";
+import type { Metadata } from "next";
+import { getServerT } from "@/i18n/server";
 
 async function getUpdates() {
   try {
@@ -26,13 +28,13 @@ function formatDate(d: string | null) {
 
 export const dynamic = "force-dynamic";
 
-function TypeBadge({ type }: { type: string }) {
-  const config: Record<string, { label: string }> = {
-    "app-update": { label: "App 更新" },
-    photo: { label: "照片" },
-    thought: { label: "产品感想" },
-  };
-  const { label } = config[type] || { label: type };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT();
+  return { title: t("nav.updates"), description: t("updates.desc"), alternates: { canonical: "/updates" } };
+}
+
+function TypeBadge({ type, labels }: { type: string; labels: Record<string, string> }) {
+  const label = labels[type] || type;
   return (
     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.72rem] font-medium tracking-wide border border-border-strong text-text-mid">
       {label}
@@ -41,8 +43,13 @@ function TypeBadge({ type }: { type: string }) {
 }
 
 export default async function UpdatesPage() {
-  const dbUpdates = await getUpdates();
+  const [dbUpdates, t] = await Promise.all([getUpdates(), getServerT()]);
   const hasData = dbUpdates.length > 0;
+  const typeLabels: Record<string, string> = {
+    "app-update": t("updates.type.app"),
+    photo: t("updates.type.photo"),
+    thought: t("updates.type.thought"),
+  };
 
   const fallbackUpdates = [
     {
@@ -115,9 +122,9 @@ export default async function UpdatesPage() {
       <Navbar />
 
       <header className="pt-36 pb-14 max-w-[820px] mx-auto px-6 md:px-15">
-        <h1 className="text-[clamp(2.5rem,5.5vw,4rem)] mb-4 tracking-[-0.02em]">动态</h1>
+        <h1 className="text-[clamp(2.5rem,5.5vw,4rem)] mb-4 tracking-[-0.02em]">{t("updates.title")}</h1>
         <p className="text-lg text-text-muted max-w-[48ch]">
-          App 更新记录、产品感想、以及日常的照片和灵感碎片。
+          {t("updates.desc")}
         </p>
       </header>
 
@@ -127,7 +134,7 @@ export default async function UpdatesPage() {
             <FadeIn key={i} delay={(i % 4) * 60}>
               <article className="relative mb-12 last:mb-0 before:content-[''] before:absolute before:-left-[37px] before:top-1.5 before:w-2.5 before:h-2.5 before:rounded-full before:bg-accent before:ring-4 before:ring-bg">
                 <div className="flex items-center gap-3 mb-4">
-                  <TypeBadge type={item.type} />
+                  <TypeBadge type={item.type} labels={typeLabels} />
                   <span className="text-xs text-text-soft font-mono">{item.date}</span>
                   {item.type === "app-update" && item.version && (
                     <span className="inline-flex items-center px-2.5 py-0.5 bg-ink text-on-ink rounded-full text-xs font-semibold font-mono">
@@ -151,7 +158,7 @@ export default async function UpdatesPage() {
 
                 {item.type === "app-update" && item.why && (
                   <div className="p-5 bg-surface border border-border rounded-2xl mb-5">
-                    <div className="text-xs font-semibold text-accent-deep tracking-wide mb-2">为什么做这个</div>
+                    <div className="text-xs font-semibold text-accent-deep tracking-wide mb-2">{t("updates.why")}</div>
                     <p className="text-sm text-text-muted leading-relaxed">{item.why}</p>
                   </div>
                 )}
@@ -189,7 +196,7 @@ export default async function UpdatesPage() {
                     href="/#product"
                     className="group inline-flex items-center gap-2 mt-5 px-5 py-2.5 bg-surface border border-border rounded-full no-underline text-text text-sm font-medium hover:border-border-strong transition-all duration-300"
                   >
-                    查看产品详情
+                    {t("card.viewProduct")}
                     <span className="transition-transform duration-300 group-hover:translate-x-0.5">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </span>

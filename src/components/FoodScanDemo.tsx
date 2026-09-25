@@ -13,6 +13,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale } from "@/i18n/LocaleProvider";
 import Reveal from "@/components/Reveal";
+import { isChineseLocale } from "@/i18n/messages";
 
 type Lang = "zh" | "en";
 type Phase = "idle" | "scanning" | "result";
@@ -89,7 +90,7 @@ const COPY = {
 
 // ── 识别数据（预设演示，黑盒，不暴露识别逻辑） ───────────────────
 const FOOD = {
-  img: "/food/food-demo-1.png",
+  img: "/food/food-demo-1.webp",
   // 标识点：x/y 为容器百分比
   items: [
     { x: 38, y: 64, zh: "鸡胸肉", en: "Chicken" },
@@ -126,7 +127,7 @@ function MacroStat({ label, grams, show, delay }: { label: string; grams: number
 
 export default function FoodScanDemo() {
   const { locale } = useLocale();
-  const lang: Lang = locale === "en" ? "en" : "zh";
+  const lang: Lang = isChineseLocale(locale) ? "zh" : "en";
   const c = COPY[lang];
 
   const { ref, inView } = useInView<HTMLDivElement>(0.35);

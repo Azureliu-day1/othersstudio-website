@@ -33,7 +33,7 @@ function prefersReducedMotion(): boolean {
 
 export default function GuideAssistant() {
   const { locale } = useLocale();
-  const lang: Lang = locale === "en" ? "en" : "zh";
+  const lang: Lang = locale === "zh" || locale === "zh-Hant" ? "zh" : "en";
   const ui = GUIDE_UI[lang];
 
   const [open, setOpen] = useState(false);
@@ -146,7 +146,7 @@ export default function GuideAssistant() {
         <div className="flex items-center gap-3 px-4 py-3.5 bg-surface border-b border-border">
           <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-accent-soft overflow-hidden">
             <img
-              src="/brand/day1-logo-3d.png"
+              src="/brand/day1-logo-3d.webp"
               alt="DAY 1"
               className="h-6 w-6 object-contain select-none"
               draggable={false}
@@ -187,7 +187,7 @@ export default function GuideAssistant() {
                 {isWelcome && (
                   <div className="flex items-center gap-2 pl-0.5 mb-0.5">
                     <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-accent-soft overflow-hidden">
-                      <img src="/brand/day1-logo-3d.png" alt="" aria-hidden="true" className="h-4 w-4 object-contain" draggable={false} />
+                      <img src="/brand/day1-logo-3d.webp" alt="" aria-hidden="true" className="h-4 w-4 object-contain" draggable={false} />
                     </span>
                     <span className="inline-flex items-center gap-1.5 text-[0.7rem] font-medium uppercase tracking-[0.1em] text-text-soft">
                       <span className="h-1.5 w-1.5 rounded-full bg-[#3FB984] motion-safe:animate-pulse" />
@@ -274,7 +274,7 @@ export default function GuideAssistant() {
           <>
             <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-on-ink/10 overflow-hidden">
               <img
-                src="/brand/day1-logo-3d.png"
+                src="/brand/day1-logo-3d.webp"
                 alt=""
                 aria-hidden="true"
                 className="h-5 w-5 object-contain select-none"
