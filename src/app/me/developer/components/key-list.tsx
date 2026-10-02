@@ -4,6 +4,7 @@ import { useState } from "react";
 import { revokeApiKey, type ApiKeyRecord } from "../actions";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/i18n/LocaleProvider";
+import { isChineseLocale } from "@/i18n/messages";
 
 const T = {
   zh: {
@@ -44,7 +45,7 @@ export function KeyList({ keys }: { keys: ApiKeyRecord[] }) {
 
 function KeyRow({ apiKey }: { apiKey: ApiKeyRecord }) {
   const { locale } = useLocale();
-  const tx = locale === "en" ? T.en : T.zh;
+  const tx = isChineseLocale(locale) ? T.zh : T.en;
   const [revoking, setRevoking] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();

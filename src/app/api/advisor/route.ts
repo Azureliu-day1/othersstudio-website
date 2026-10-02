@@ -9,6 +9,7 @@ import {
   type Experience,
 } from "@/lib/advisor";
 import { isRelayConfigured, callRelayChat, type ChatMessage } from "@/lib/ai-relay";
+import { isChineseLocale, normalizeLocale } from "@/i18n/messages";
 
 export const dynamic = "force-dynamic";
 
@@ -125,7 +126,8 @@ export async function POST(req: Request) {
     body = {};
   }
   const input = normalizeInput(body);
-  const locale: "zh" | "en" = body.locale === "en" ? "en" : "zh";
+  const raw = normalizeLocale(typeof body.locale === "string" ? body.locale : null);
+  const locale: "zh" | "en" = raw && isChineseLocale(raw) ? "zh" : "en";
 
   // 开关式真 AI：配了密钥就尝试真调，失败回退预设
   if (isRelayConfigured()) {

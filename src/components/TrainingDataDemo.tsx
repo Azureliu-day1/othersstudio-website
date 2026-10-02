@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "@/i18n/LocaleProvider";
 import Reveal from "@/components/Reveal";
+import { isChineseLocale } from "@/i18n/messages";
 
 type Lang = "zh" | "en";
 
@@ -342,7 +343,7 @@ function DirArrow({ dir }: { dir: "up" | "down" | "flat" }) {
 
 export default function TrainingDataDemo() {
   const { locale } = useLocale();
-  const lang: Lang = locale === "en" ? "en" : "zh";
+  const lang: Lang = isChineseLocale(locale) ? "zh" : "en";
   const c = COPY[lang];
 
   const { ref, inView } = useInView<HTMLDivElement>(0.35);
