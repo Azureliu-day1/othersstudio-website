@@ -14,6 +14,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "@/i18n/LocaleProvider";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { isChineseLocale } from "@/i18n/messages";
 
 type Lang = "zh" | "en";
 
@@ -391,8 +392,8 @@ function InteractiveBody({ inView, lang }: { inView: boolean; lang: Lang }) {
     <div ref={rootRef} className="relative w-full max-w-[480px] mx-auto select-none">
       <div className="relative w-full aspect-[800/1024] overflow-hidden rounded-2xl">
         {/* 正 / 背面叠放，淡入淡出切换（不用 3D 镜像翻转，保证两面都居中、点位精准） */}
-        <BodyFace face="front" src="/anatomy/body-glow-front-tight.png" flipped={flipped} inView={inView} lang={lang} reduced={reduced} selected={selected} onSelect={setSelectedId} isMobile={isMobile} pulsing={visibleNow} />
-        <BodyFace face="back" src="/anatomy/body-glow-tight.png" flipped={flipped} inView={inView} lang={lang} reduced={reduced} selected={selected} onSelect={setSelectedId} isMobile={isMobile} pulsing={visibleNow} />
+        <BodyFace face="front" src="/anatomy/body-glow-front-tight.webp" flipped={flipped} inView={inView} lang={lang} reduced={reduced} selected={selected} onSelect={setSelectedId} isMobile={isMobile} pulsing={visibleNow} />
+        <BodyFace face="back" src="/anatomy/body-glow-tight.webp" flipped={flipped} inView={inView} lang={lang} reduced={reduced} selected={selected} onSelect={setSelectedId} isMobile={isMobile} pulsing={visibleNow} />
 
         {/* 复位点击层：仅选中时渲染，避免空覆盖层拦截触摸 */}
         {selected && (
@@ -489,7 +490,7 @@ function FeatureRow({ reverse, lang }: { reverse: boolean; lang: Lang }) {
 
 export default function FeatureShowcase() {
   const { locale } = useLocale();
-  const lang: Lang = locale === "en" ? "en" : "zh";
+  const lang: Lang = isChineseLocale(locale) ? "zh" : "en";
   const c = SECTION[lang];
 
   return (

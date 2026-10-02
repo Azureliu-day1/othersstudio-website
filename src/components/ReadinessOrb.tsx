@@ -16,6 +16,7 @@
 import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale } from "@/i18n/LocaleProvider";
+import { isChineseLocale } from "@/i18n/messages";
 
 type Lang = "zh" | "en";
 type Bi = { zh: string; en: string };
@@ -304,7 +305,7 @@ function PageSignals({ lang }: { lang: Lang }) {
 // ============================ 主组件（翻页容器）============================
 export default function ReadinessOrb({ initialPage = 0 }: { initialPage?: number }) {
   const { locale } = useLocale();
-  const lang: Lang = locale === "en" ? "en" : "zh";
+  const lang: Lang = isChineseLocale(locale) ? "zh" : "en";
   const c = COPY[lang];
   const reduced = !!useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);

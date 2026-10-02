@@ -3,6 +3,7 @@ import { listApiKeys } from "./actions";
 import { KeyList } from "./components/key-list";
 import { CreateKeyForm } from "./components/create-key-form";
 import { getLocale } from "@/i18n/server";
+import { isChineseLocale } from "@/i18n/messages";
 
 export const metadata = {
   title: "DAY 1 — Developer",
@@ -128,7 +129,7 @@ const COPY = {
 
 export default async function DeveloperPage() {
   const [keys, locale] = await Promise.all([listApiKeys(), getLocale()]);
-  const isEn = locale === "en";
+  const isEn = !isChineseLocale(locale);
   const c = isEn ? COPY.en : COPY.zh;
   const activeKeys = keys.filter((k) => k.is_active);
   const revokedKeys = keys.filter((k) => !k.is_active);

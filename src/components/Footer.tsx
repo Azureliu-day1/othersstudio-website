@@ -50,6 +50,12 @@ export default async function Footer() {
           <Link href="/updates" className="block text-sm text-text-muted no-underline mb-2.5 hover:text-text transition-colors">
             {t("footer.link.updates")}
           </Link>
+          <a href="https://azureliu-day1.github.io/day1-app/privacy.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-text-muted no-underline mb-2.5 hover:text-text transition-colors">
+            {t("footer.link.privacy")}
+          </a>
+          <a href="https://azureliu-day1.github.io/day1-app/terms.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-text-muted no-underline mb-2.5 hover:text-text transition-colors">
+            {t("footer.link.terms")}
+          </a>
         </div>
 
         <div>
@@ -103,7 +109,7 @@ export default async function Footer() {
       </div>
 
       <div className="max-w-[1200px] mx-auto mt-16 pt-6 border-t border-border flex flex-col md:flex-row justify-between items-center text-xs text-text-soft gap-3">
-        <span>&copy; 2025 DAY 1 Team. {t("footer.rights")}</span>
+        <span>&copy; {new Date().getFullYear()} DAY 1 Team. {t("footer.rights")}</span>
         <span>{t("footer.built")}</span>
       </div>
     </footer>

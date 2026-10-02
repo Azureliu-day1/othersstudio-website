@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getLocale } from "@/i18n/server";
+import { isChineseLocale } from "@/i18n/messages";
 
 export const metadata = {
   title: "DAY 1 — API 文档",
@@ -184,7 +185,7 @@ const COPY = {
 
 export default async function DocsPage() {
   const locale = await getLocale();
-  const isEn = locale === "en";
+  const isEn = !isChineseLocale(locale);
   const c = isEn ? COPY.en : COPY.zh;
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">

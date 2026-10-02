@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import {
   type Locale,
   LOCALE_COOKIE,
+  LOCALE_TAGS,
   DEFAULT_LOCALE,
   translate,
 } from "./messages";
@@ -37,6 +38,7 @@ export function LocaleProvider({
     (next: Locale) => {
       // 一年有效期的语言偏好 cookie
       document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+      document.documentElement.lang = LOCALE_TAGS[next];
       router.refresh();
     },
     [router]
