@@ -9,4 +9,4 @@ import { ko } from "./ko";
 export const GUIDES: Record<Locale, GuideDoc> = { zh, "zh-Hant": zhHant, en, ja, ko };
 
 /** 已经拍了本语言 App 截图的语言；其他语言回退简中截图 */
-export const SHOT_LOCALES = new Set<Locale>(["zh"]);
+export const SHOT_LOCALES = new Set<Locale>(["zh", "en"]);

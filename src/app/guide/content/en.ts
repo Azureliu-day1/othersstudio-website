@@ -410,7 +410,6 @@ export const en: GuideDoc = {
   stepLabel: "Step {n}",
   tocLabel: "Guide contents",
   panelLabels: { what: "What it does", where: "Where to find it", perms: "Permissions it needs", fix: "Denied or not connected? Fix it" },
-  shotNote: "Screenshots show the Chinese version of the app. In the English version, every button is in the same place, and the button names are the ones written in this guide.",
   contactText: "Still have questions? Email us:",
   backHome: "Back to home",
   sections: [readiness, training, coach, food, voice, report, share, permissions],
