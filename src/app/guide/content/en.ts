@@ -383,7 +383,7 @@ const permissions: Section = {
     {
       kind: "callout",
       title: "Permissions on Apple Watch",
-      body: "The first time you open DAY 1 on your watch, it asks to read heart rate, resting heart rate, HRV and sleep, and to send notifications. The first time you start a workout on your watch, it asks again to save workouts. Tapping [=Turn On All=] on iPhone doesn't carry over to your watch. You need to tap Allow on the watch too.",
+      body: "The first time you open DAY 1 on your watch, it asks to read heart rate, resting heart rate, HRV and sleep, and to send notifications. The first time you start a workout on your watch, it asks again to save workouts. Your iPhone and watch share the same Health permissions, so you usually don't need to set them twice. If the watch asks, tap Allow.",
     },
     {
       kind: "faq",
