@@ -220,7 +220,7 @@ export default async function GuidePage() {
         </ol>
       </header>
 
-      <nav aria-label={doc.tocLabel} className="sticky top-[72px] z-30 bg-bg/90 backdrop-blur">
+      <nav aria-label={doc.tocLabel} className="sticky top-16 z-30 bg-bg/90 backdrop-blur">
         <div className="max-w-[960px] mx-auto px-6 md:px-15">
           <div className="flex gap-2 overflow-x-auto border-y border-border py-3 [scrollbar-width:none]">
             {doc.sections.map((s) => (
