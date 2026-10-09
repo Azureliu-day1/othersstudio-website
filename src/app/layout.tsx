@@ -30,7 +30,7 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
-const SITE_URL = "https://othersstudio.tech";
+const SITE_URL = "https://day1aifitness.com";
 
 /** 站点级 metadata 跟随语言：标题、描述、分享卡片文案 */
 export async function generateMetadata(): Promise<Metadata> {
