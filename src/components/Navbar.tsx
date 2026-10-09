@@ -12,6 +12,7 @@ export default function Navbar() {
   const { t } = useLocale();
 
   const links = [
+    { href: "/guide", label: t("nav.guide") },
     { href: "/thoughts", label: t("nav.thoughts") },
     { href: "/updates", label: t("nav.updates") },
     { href: "/#product", label: t("nav.product") },

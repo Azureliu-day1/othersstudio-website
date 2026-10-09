@@ -44,6 +44,9 @@ export default async function Footer() {
           <h4 className="font-sans text-xs font-semibold tracking-wider uppercase text-text mb-5">
             {t("footer.col.content")}
           </h4>
+          <Link href="/guide" className="block text-sm text-text-muted no-underline mb-2.5 hover:text-text transition-colors">
+            {t("nav.guide")}
+          </Link>
           <Link href="/thoughts" className="block text-sm text-text-muted no-underline mb-2.5 hover:text-text transition-colors">
             {t("footer.link.thoughts")}
           </Link>
