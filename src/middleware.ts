@@ -8,8 +8,21 @@ import { normalizeLocale } from "@/i18n/messages";
 // 命中后设置 NEXT_LOCALE cookie，并重写到去掉前缀的干净 URL（URL 不暴露前缀）。
 const LOCALE_PREFIXES = ["en", "zh", "zh-hant", "zh-hans", "zh-tw", "zh-hk", "ja", "ko"] as const;
 
+// 主域名：day1aifitness.com。旧域名与 www 一律 301 到主域名，路径与查询参数原样保留。
+// 例外：旧域名上的 /me/*（开发者门户登录）暂不跳——新域名的 OAuth 回调地址需要先在 Supabase 加白名单，
+// 加好之后把 LEGACY_KEEP_PREFIXES 清空即可。ai.othersstudio.tech 是另一个 Worker，不经过这里。
+const CANONICAL_HOST = "day1aifitness.com";
+const LEGACY_HOSTS = new Set(["othersstudio.tech", "www.othersstudio.tech"]);
+const LEGACY_KEEP_PREFIXES = ["/me"];
+
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
+
+  const host = (request.headers.get("host") || "").toLowerCase().split(":")[0];
+  const isLegacy = LEGACY_HOSTS.has(host) && !LEGACY_KEEP_PREFIXES.some((p) => pathname.startsWith(p));
+  if (isLegacy || host === `www.${CANONICAL_HOST}`) {
+    return NextResponse.redirect(`https://${CANONICAL_HOST}${pathname}${search}`, 301);
+  }
 
   // 语言前缀处理（最前、独立于鉴权逻辑）
   const seg = pathname.split("/")[1]?.toLowerCase();
@@ -96,9 +109,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/admin/:path*", "/me/:path*",
-    "/en/:path*", "/en", "/zh/:path*", "/zh", "/zh-hant/:path*", "/zh-hant", "/zh-hans/:path*", "/zh-hans",
-    "/zh-tw/:path*", "/zh-tw", "/zh-hk/:path*", "/zh-hk", "/ja/:path*", "/ja", "/ko/:path*", "/ko",
-  ],
+  // 全站都要过主域名跳转；静态资源与图片不走中间件
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\.(?:png|jpg|jpeg|webp|svg|gif|ico|glb)$).*)"],
 };
