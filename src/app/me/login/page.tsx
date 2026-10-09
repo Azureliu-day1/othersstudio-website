@@ -34,8 +34,10 @@ export default function MeLoginPage() {
     setError(null);
 
     const supabase = createClient();
+    // 回调地址必须与 Supabase 白名单逐字一致：带 ?next= 会匹配失败，Supabase 退回 Site URL（旧域名首页），
+    // 授权码落在首页没人处理 → 登录后又回到登录页。登录后要去的页面改存 10 分钟 cookie。
     const callbackUrl = new URL("/me/auth/callback", getSiteUrl());
-    callbackUrl.searchParams.set("next", getSafeNextPath());
+    document.cookie = `me_next=${encodeURIComponent(getSafeNextPath())}; path=/; max-age=600; samesite=lax; secure`;
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider,

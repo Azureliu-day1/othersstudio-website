@@ -24,6 +24,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(`https://${CANONICAL_HOST}${pathname}${search}`, 301);
   }
 
+  // OAuth 兜底：回调地址未命中白名单时 Supabase 会退回 Site URL，授权码落在首页，这里转给回调路由
+  if (pathname === "/" && request.nextUrl.searchParams.has("code")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/me/auth/callback";
+    return NextResponse.redirect(url);
+  }
+
   // 语言前缀处理（最前、独立于鉴权逻辑）
   const seg = pathname.split("/")[1]?.toLowerCase();
   const locale = (LOCALE_PREFIXES as readonly string[]).includes(seg) ? normalizeLocale(seg) : null;
