@@ -8,7 +8,8 @@ import Footer from "@/components/Footer";
  *
  * 只完整写了第一节「红绿灯 + Apple Health + 手表」，用来先验证格式：
  * 用户看完能不能自己完成连接、知道要戴表睡觉。格式验证通过后再铺开其余 6 节、做五语言。
- * 所有 App 内文案（按钮名、弹窗原文）均逐字取自 iOS 源码 StringsZH.swift / DAY-1-Info.plist。
+ * 所有 App 内文案（按钮名、弹窗原文）均逐字取自 iOS 源码 StringsZH.swift / DAY-1-Info.plist，
+ * 截图来自 iPhone 17 Pro 模拟器上的 3.2 中文版真实流程（新账号，从注册走到第一次打卡）。
  */
 
 export const metadata: Metadata = {
@@ -29,15 +30,12 @@ const SECTIONS = [
   { id: "permissions", title: "全部权限一览", ready: false },
 ];
 
-/** 截图占位：拿到 3.2 中文真机截图后替换。用灰框而不是画假界面。 */
-function Shot({ label }: { label: string }) {
+/** 真机界面截图（模拟器 3.2 中文版，已去掉状态栏）。宽 540，等比缩放。 */
+function Shot({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="aspect-[9/16] w-full max-w-[200px] rounded-[28px] border-2 border-dashed border-border-strong bg-bg-alt flex items-center justify-center p-5 text-center">
-      <span className="text-xs leading-relaxed text-text-muted">
-        截图
-        <br />
-        {label}
-      </span>
+    <div className="w-full max-w-[220px] overflow-hidden rounded-[26px] border border-border-strong bg-[#0B0B0F] shadow-[0_10px_30px_var(--c-shadow-strong)]">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} width={540} height={1109} loading="lazy" decoding="async" className="block w-full h-auto" />
     </div>
   );
 }
@@ -80,7 +78,7 @@ export default function GuidePage() {
           {[
             { t: "连接 Apple Health", d: <>打开 App，点主页的 <UI>连接 Apple Watch</UI>，选 <UI>连接 Apple Health</UI>，在授权页打开全部。</> },
             { t: "戴着手表睡一晚", d: <>心率变异性（HRV）大多在你睡着时测量。不戴表睡，红绿灯就只能靠问卷估算。</> },
-            { t: "早上花 30 秒打卡", d: <>第二天打开 App，点 <UI>新的一天</UI> 卡片，回答精力、酸痛、压力几个问题。</> },
+            { t: "早上花 30 秒打卡", d: <>第二天打开 App，点主页的 <UI>新的一天</UI> 卡片，回答 6 个小问题，马上拿到今天的灯。</> },
           ].map((s, i) => (
             <li key={s.t} className="rounded-2xl border border-border bg-surface p-6">
               <span className="font-mono text-xs text-accent-deep">第 {i + 1} 步</span>
@@ -128,8 +126,8 @@ export default function GuidePage() {
 
             <Panel label="在 App 哪里">
               <p>主页最上方那张大卡片就是红绿灯。</p>
-              <p><b className="text-text">长按</b>它，进入详情页，能看到分数是怎么算出来的、哪一项在拖后腿。</p>
-              <p>每天第一次打开时，卡片上会显示 <UI>🌅 新的一天</UI>，点它完成 30 秒晨间打卡。</p>
+              <p>每天第一次打开时，这张卡片显示 <UI>新的一天</UI>。点它做完 30 秒打卡，卡片就变成 <UI>今日训练建议</UI> 和一盏灯。</p>
+              <p>之后<b className="text-text">点一下</b>这张卡片，进入详情页，能看到分数是怎么算出来的、哪一项在拖后腿。</p>
             </Panel>
 
             <Panel label="需要什么权限">
@@ -143,26 +141,45 @@ export default function GuidePage() {
             </Panel>
 
             <Panel label="拒绝了 / 没连上，怎么补开">
-              <p><b className="text-text">在 App 里：</b><UI>我的</UI> → <UI>HealthKit 授权</UI>，重新点一次。</p>
+              <p><b className="text-text">在 App 里：</b>底部 <UI>我的</UI> → <UI>HealthKit 授权</UI>，重新点一次。</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/guide/zh/me-healthkit.webp" alt="「我的」页面里的「设备管理」和「HealthKit 授权」两行" width={720} height={242} loading="lazy" className="block w-full h-auto rounded-xl border border-border" />
               <p>
                 <b className="text-text">在 iPhone 设置里：</b>
-                <UI>设置</UI> → <UI>隐私与安全性</UI> → <UI>健康</UI> → <UI>FitTrack</UI> → <UI>打开所有</UI>
+                <UI>设置</UI> → <UI>隐私与安全性</UI> → <UI>健康</UI> → <UI>DAY 1</UI>，把读取的项目全部打开。
               </p>
-              <p className="text-sm text-text-muted">也可以从 设置 → 健康 → 数据访问与设备 → FitTrack 进去，效果一样。</p>
+              <p className="text-sm text-text-muted">如果系统弹窗已经被拒绝过，App 里再点也不会弹，这时只能走 iPhone 设置这条路。</p>
             </Panel>
           </div>
 
           {/* 一步一步 */}
-          <h3 className="mt-16 mb-6 text-xl text-text">第一次连接 Apple Health，一步一步</h3>
-          <ol className="list-none p-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <h3 className="mt-16 mb-2 text-xl text-text">第一次连接 Apple Health，一步一步</h3>
+          <p className="mb-8 text-[15px] text-text-muted">下面都是 App 里的真实界面，照着点就行。</p>
+          <ol className="list-none p-0 grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-8">
             {[
-              { t: <>在主页点 <UI>连接 Apple Watch</UI> 卡片</>, s: "主页「连接 Apple Watch」卡片" },
-              { t: <>在「健康数据来源」里选 <UI>连接 Apple Health</UI></>, s: "健康数据来源 选择页" },
-              { t: <>系统弹出「健康」授权页，点 <UI>打开所有</UI></>, s: "iOS 健康授权页" },
-              { t: <>点右上角 <UI>允许</UI>，回到主页，卡片消失就成功了</>, s: "连接成功后的主页" },
+              {
+                src: "/guide/zh/health-source.webp",
+                alt: "健康数据来源选择页，三个选项",
+                t: <>在主页点 <UI>连接 Apple Watch</UI> 卡片，弹出「健康数据来源」，选第一个 <UI>连接 Apple Health</UI>。</>,
+              },
+              {
+                src: "/guide/zh/ios-sheet.webp",
+                alt: "iOS 健康授权页，开关都是关的",
+                t: <>系统弹出「访问健康数据」，开关默认都是关的。点 <UI>全部打开</UI>。</>,
+              },
+              {
+                src: "/guide/zh/ios-sheet-allowed.webp",
+                alt: "iOS 健康授权页，开关全部打开，底部允许按钮变蓝",
+                t: <>开关全部变绿后，点最下面蓝色的 <UI>允许</UI>。</>,
+              },
+              {
+                src: "/guide/zh/home-readiness.webp",
+                alt: "主页，连接 Apple Watch 卡片已消失，显示今日训练建议黄灯",
+                t: <>回到主页，<UI>连接 Apple Watch</UI> 卡片不见了，就是连上了。</>,
+              },
             ].map((step, i) => (
-              <li key={i} className="flex flex-col gap-3">
-                <Shot label={step.s} />
+              <li key={step.src} className="flex flex-col gap-3">
+                <Shot src={step.src} alt={step.alt} />
                 <p className="text-sm leading-relaxed text-text-mid">
                   <span className="font-mono text-xs text-accent-deep mr-1.5">{i + 1}</span>
                   {step.t}
@@ -172,13 +189,43 @@ export default function GuidePage() {
           </ol>
 
           <div className="mt-8 rounded-2xl border border-border bg-bg-alt p-6 text-[15px] leading-relaxed text-text-mid">
-            <b className="text-text">授权页上写的是「FitTrack」，不是「DAY 1」？</b>
+            <b className="text-text">授权页底部的小字写着「FitTrack」？</b>
             <br />
-            没点错，FitTrack 是 DAY 1 在系统里的名字，放心允许。系统弹窗上的原话是：
-            <blockquote className="mt-3 mb-0 border-l-2 border-accent pl-4 text-text-muted">
-              FitTrack 需要读取您的健康数据（步数、心率、睡眠等）以提供个性化训练建议和恢复分析。
-            </blockquote>
+            FitTrack 是 DAY 1 以前的名字，是同一个 App。授权页标题写的是「DAY 1 想要访问并更新你的健康数据」，放心允许。
           </div>
+
+          {/* 第二天早上 */}
+          <h3 className="mt-16 mb-2 text-xl text-text">第二天早上：30 秒打卡</h3>
+          <p className="mb-8 text-[15px] leading-relaxed text-text-muted max-w-[62ch]">
+            打开 App，主页会出现 <UI>新的一天</UI> 卡片。点进去按顺序做完，就能看到今天的灯和两套训练方案。
+          </p>
+          <ol className="list-none p-0 grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-8">
+            {[
+              {
+                src: "/guide/zh/sleep-fill.webp",
+                alt: "昨晚未记录到睡眠，手动填写睡眠时长",
+                t: <>如果手表昨晚没记到睡眠，会先问你睡了多久。拖到大概的小时数，点 <UI>记录完成</UI>。戴表睡了就不会出现这一步。</>,
+              },
+              {
+                src: "/guide/zh/checkin.webp",
+                alt: "晨间打卡第 1 题，今天感觉怎么样",
+                t: <>回答 6 个小问题，每题点一个最接近的选项，再点 <UI>下一步</UI>。凭第一感觉选就好。</>,
+              },
+              {
+                src: "/guide/zh/checkin-result.webp",
+                alt: "打卡结果，黄灯 59 分，方案 A 正常训练、方案 B 轻量训练",
+                t: <>出结果：一盏灯、一个分数、两套方案。标着 <UI>推荐</UI> 的就是今天最合适的练法。</>,
+              },
+            ].map((step, i) => (
+              <li key={step.src} className={`flex flex-col gap-3 ${i === 2 ? "col-span-2 lg:col-span-1" : ""}`}>
+                <Shot src={step.src} alt={step.alt} />
+                <p className="text-sm leading-relaxed text-text-mid">
+                  <span className="font-mono text-xs text-accent-deep mr-1.5">{i + 1}</span>
+                  {step.t}
+                </p>
+              </li>
+            ))}
+          </ol>
 
           {/* 前 14 天 */}
           <h3 className="mt-16 mb-3 text-xl text-text">为什么前几天的灯「不太准」</h3>
@@ -230,7 +277,11 @@ export default function GuidePage() {
               },
               {
                 q: "主页的「连接 Apple Watch」卡片一直在",
-                a: "说明授权没给全。去 iPhone 设置 → 隐私与安全性 → 健康 → FitTrack，把读取的项目全部打开，再回到 App。",
+                a: "说明授权没给全。去 iPhone 设置 → 隐私与安全性 → 健康 → DAY 1，把读取的项目全部打开，再回到 App。",
+              },
+              {
+                q: "每天早上都让我补填睡眠",
+                a: "说明 App 没读到手表的睡眠记录。确认睡觉时戴着手表，并且 iPhone「健康」App 里能看到昨晚的睡眠。没有手表的话，每天填一下时长就行，灯会参考它。",
               },
               {
                 q: "手表换了 / App 重装后，灯又变回「学习中」",
