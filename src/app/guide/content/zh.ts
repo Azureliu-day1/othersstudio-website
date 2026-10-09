@@ -384,7 +384,7 @@ const permissions: Section = {
     {
       kind: "callout",
       title: "Apple Watch 上的权限",
-      body: "第一次打开手表上的 DAY 1，会问你要读取心率、静息心率、HRV、睡眠和通知。第一次在手表上开始训练时，会再问一次写入体能训练记录。在 iPhone 上点 [=全部打开=] 不会自动带到手表，手表上也要点一次允许。",
+      body: "第一次打开手表上的 DAY 1，会问你要读取心率、静息心率、HRV、睡眠和通知。第一次在手表上开始训练时，会再问一次写入体能训练记录。iPhone 和手表共用同一份健康授权，一般不用重复设置；如果手表上弹出授权，点允许即可。",
     },
     {
       kind: "faq",
@@ -398,9 +398,9 @@ const permissions: Section = {
 };
 
 export const zh: GuideDoc = {
-  metaTitle: "上手指南",
+  metaTitle: "使用指南",
   metaDescription: "第一次用 DAY 1：连接 Apple Health、戴表睡一晚、第二天早上看红绿灯。每个功能需要什么权限、拒绝了怎么补开。",
-  eyebrow: "上手指南",
+  eyebrow: "使用指南",
   heroTitle: ["第一次用 DAY 1，", "照着做这 3 步。"],
   heroLead: "DAY 1 的红绿灯靠你昨晚的身体数据来判断今天该怎么练。下面三步做完，第二天早上就能看到第一盏真正属于你的灯。",
   quick: [
