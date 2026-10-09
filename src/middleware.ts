@@ -9,11 +9,11 @@ import { normalizeLocale } from "@/i18n/messages";
 const LOCALE_PREFIXES = ["en", "zh", "zh-hant", "zh-hans", "zh-tw", "zh-hk", "ja", "ko"] as const;
 
 // 主域名：day1aifitness.com。旧域名与 www 一律 301 到主域名，路径与查询参数原样保留。
-// 例外：旧域名上的 /me/*（开发者门户登录）暂不跳——新域名的 OAuth 回调地址需要先在 Supabase 加白名单，
-// 加好之后把 LEGACY_KEEP_PREFIXES 清空即可。ai.othersstudio.tech 是另一个 Worker，不经过这里。
+// 新域名的 OAuth 回调（/me/auth/callback）已加入 Supabase 白名单，开发者门户也一并跳转。
+// 需要临时保留旧域名某些路径时，把前缀加进 LEGACY_KEEP_PREFIXES。ai.othersstudio.tech 是另一个 Worker，不经过这里。
 const CANONICAL_HOST = "day1aifitness.com";
 const LEGACY_HOSTS = new Set(["othersstudio.tech", "www.othersstudio.tech"]);
-const LEGACY_KEEP_PREFIXES = ["/me"];
+const LEGACY_KEEP_PREFIXES: string[] = [];
 
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
