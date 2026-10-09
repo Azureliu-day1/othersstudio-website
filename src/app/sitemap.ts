@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { supabaseAdmin } from "@/lib/supabase";
 
-const SITE_URL = "https://othersstudio.tech";
+const SITE_URL = "https://day1aifitness.com";
 
 export const dynamic = "force-dynamic";
 

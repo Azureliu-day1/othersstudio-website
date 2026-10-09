@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase-browser";
 
-const PRODUCTION_SITE_URL = "https://othersstudio.tech";
+const PRODUCTION_SITE_URL = "https://day1aifitness.com";
 
 function getSiteUrl() {
   const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
